@@ -53,4 +53,4 @@ proc createConfigFile() =
   else:
     displayMessage("'.overcast' configuration directory doesn't exist", "FAIL")
 
-createConfDir()
+
