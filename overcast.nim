@@ -14,15 +14,19 @@ proc displayMessage(msg: string, msgType: string) =
       echo "[SUCCESS] - ", msg
     of "FAIL":
       echo "[FAILURE] - ", msg
+    of "INFO":
+      echo "[INFO] - " , msg
+
 
 proc createConfDir() =
   var overcastConfigDir = getHomeDir() & ".overcast"
   
   if not existsDir(overcastConfigDir):
-    echo "creating config directory @ ", overcastConfigDir
+    displayMessage("creating config directory @ " & overcastConfigDir, "INFO")
     createDir(overcastConfigDir)
   else:
-    echo "Overcast '.overcast' configuration directory already exists"
+    displayMessage("Overcast '.overcast' configuration directory already exists", "INFO")
+
 
 proc configDirExists(): bool =
   var overcastDir = getHomeDir() & ".overcast"
@@ -30,6 +34,7 @@ proc configDirExists(): bool =
     true
   else:
     false
+
 
 proc createConfigFile() =
   if configDirExists():
@@ -48,4 +53,4 @@ proc createConfigFile() =
   else:
     displayMessage("'.overcast' configuration directory doesn't exist", "FAIL")
 
-
+createConfDir()
