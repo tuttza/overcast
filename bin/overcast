@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'overcast'
+require 'optparse'
+
+options = {}
+OptionParser.new do |option|
+  option.banner = "Overcast"
+
+  option.on('-i', '--init', 'Initialize needed configuration files and directories') do |o|
+    options[:init] = o
+  end
+
+  option.on('-a', '--add_dir PATH_TO_DIR', 'Add a directory to the directories.yml file') do |o|
+    options[:add_dir] = o
+  end
+
+  option.on('-v', '--version', 'Display application version') do |o|
+    options[:version] = o
+  end
+
+  option.on('-h', '--help', 'Display commandline arguments and options') do
+    puts option
+  end
+
+end.parse!
+
+if options[:init]
+  Overcast::Configuration.execute
+end
+
+if options[:version]
+  puts "Overcast #{Overcast::VERSION}"
+end
+
+if options[:add_dir]
+  Overcast::Configuration.add_directory(options[:add_dir])
+end
