@@ -2,76 +2,91 @@ require 'yaml'
 require 'logger'
 require_relative 'helpers.rb'
 
-include Overcast::Helpers
-
 module Overcast
   class Configuration
+    include Overcast::Helpers
 
-    @@logger = Logger.new(STDOUT)
-    @@logger.level = Logger::INFO
-    @@logger.datetime_format = '%Y-%m-%d %H:%M:%S'
+    attr_reader :logger, :conf_dir_path, :directories_yaml_path, :backup_dirs_yaml_file, :locations
 
-    @@conf_dir_path = File.join(File.expand_path('~'), '.overcast')
-    @@directories_yaml_path = File.join(@@conf_dir_path, 'directories.yml')
+    def initialize
+      @logger = Logger.new(STDOUT)
+      @logger.level = Logger::INFO
+      @logger.datetime_format = '%Y-%m-%d %H:%M:%S'
 
+      @conf_dir_path = File.join(File.expand_path('~'), '.overcast')
+      @directories_yaml_path = File.join(conf_dir_path, 'directories.yml')
+      @backup_dirs_yaml_file = YAML.load_file(directories_yaml_path) if config?
+      @locations = backup_dirs_yaml_file[:locations] if config?
+    end
 
-    def self.execute
+    def init_config_setup
       create_config_dir
       create_directories_conf
     end
 
-    def self.add_directory(dir)
-      return if !dir.is_a? String
+    def add_directory(dir)
+      added = false
+      return added if !dir.is_a? String
       if config_ready?
-        if is_valid_path?(dir)
-          @@logger.info("config ready")
+        if is_valid_path? dir
+          locations.push dir
+          File.write(directories_yaml_path, YAML.dump({ locations: locations.uniq }))
+          logger.info "Successfully added path: '#{dir}'" if locations.include? dir
+          added = true
         else
-          @@logger.fatal("Path provided: '#{dir}' is not a valid path.")
-          return
+          logger.fatal "Path provided: '#{dir}' is not a valid path."
+          return added
         end
-        # @@logger.info("adding #{dir} to #{@@conf_dir_path}")
+      end
+      added
+    end
+
+    def display_locations
+      puts "-------------------------"
+      puts "| BACKUP DIRECTORIES [#{locations.size > 0 ? locations.size : 0}]|"
+      puts "-------------------------"
+      if locations.size.zero?
+        puts "No directories have been added..."
+      end
+
+      locations.each_with_index do |loc, index|
+        index += 1
+        puts "#{index}: #{loc}"
       end
     end
 
-    def self.config_ready?
+    def config_ready?
       config_dir? && config?
     end
 
-    def self.config_dir?
-      Dir.exist? @@conf_dir_path
+    def config_dir?
+      Dir.exist? conf_dir_path
     end
 
-    def self.config?
-      File.exist? @@directories_yaml_path
+    def config?
+      File.exist? directories_yaml_path
     end
 
     private
-    # creates ~/.overcast directory
-    #
-    # return: Object -> nil
-    def self.create_config_dir
-      if Dir.exist?(@@conf_dir_path)
-        @@logger.warn("#{@@conf_dir_path} already exists...")
+
+    def create_config_dir
+      if Dir.exist? conf_dir_path
+        logger.warn "#{conf_dir_path} already exists..."
         return
       else
-        Dir.mkdir(@@conf_dir_path)
-        @@logger.info("creating #{@@conf_dir_path}...")
+        Dir.mkdir conf_dir_path
+        logger.info "creating #{conf_dir_path}..."
       end
     end
 
-    # create ~/.overcast/directories.yml
-    #
-    # return: Object: nil
-    def self.create_directories_conf
-      if Dir.exist?(@@conf_dir_path) && !File.exist?(@@directories_yaml_path)
-        File.open(@@directories_yaml_path, 'w') { |file|
-          file.write(
-              YAML::dump({ locations: [] })
-          )
+    def create_directories_conf
+      if Dir.exist?(conf_dir_path) && !File.exist?(directories_yaml_path)
+        File.open(directories_yaml_path, 'w') { |file|
+          file.write(YAML::dump({ locations: [] }))
         }
-        @@logger.info("creating #{@@directories_yaml_path}...")
+        logger.info "creating #{directories_yaml_path}..."
       else
-        @@logger.warn("#{@@directories_yaml_path} already exists...")
+        logger.warn "#{directories_yaml_path} already exists..."
         return
       end
     end
