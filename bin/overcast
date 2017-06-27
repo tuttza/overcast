@@ -6,18 +6,22 @@ require 'optparse'
 
 options = {}
 OptionParser.new do |option|
-  option.banner = "Overcast"
+  option.banner = 'Overcast'
 
-  option.on('-i', '--init', 'Initialize needed configuration files and directories') do |o|
-    options[:init] = o
+  option.on('-i', '--init', 'Initialize needed configuration files and directories') do |opt|
+    options[:init] = opt
   end
 
-  option.on('-a', '--add_dir PATH_TO_DIR', 'Add a directory to the directories.yml file') do |o|
-    options[:add_dir] = o
+  option.on('-a', '--add_dir PATH_TO_DIR', 'Add a directory to the directories.yml file') do |opt|
+    options[:add_dir] = opt
   end
 
-  option.on('-v', '--version', 'Display application version') do |o|
-    options[:version] = o
+  option.on('-v', '--version', 'Display application version') do |opt|
+    options[:version] = opt
+  end
+
+  option.on('-lbd', '--list-backup-dirs', 'Prints the list of directories from directories.yml') do |opt|
+    options[:list_backup_directories] = opt
   end
 
   option.on('-h', '--help', 'Display commandline arguments and options') do
@@ -27,13 +31,20 @@ OptionParser.new do |option|
 end.parse!
 
 if options[:init]
-  Overcast::Configuration.execute
+  oc_config = Overcast::Configuration.new
+  oc_config.init_config_setup
 end
 
 if options[:version]
   puts "Overcast #{Overcast::VERSION}"
 end
 
+if options[:list_backup_directories]
+  oc_config = Overcast::Configuration.new
+  oc_config.display_locations
+end
+
 if options[:add_dir]
-  Overcast::Configuration.add_directory(options[:add_dir])
+  oc_config = Overcast::Configuration.new
+  oc_config.add_directory(options[:add_dir])
 end
