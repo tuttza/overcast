@@ -6,7 +6,7 @@ module Overcast
   class Configuration
     include Overcast::Helpers
 
-    attr_reader :logger, :conf_dir_path, :directories_yaml_path, :backup_dirs_yaml_file, :locations
+    attr_reader :logger, :conf_dir_path, :directories_yaml_path, :directories_yaml_file, :locations
 
     def initialize
       @logger = Logger.new(STDOUT)
@@ -15,8 +15,8 @@ module Overcast
 
       @conf_dir_path = File.join(File.expand_path('~'), '.overcast')
       @directories_yaml_path = File.join(conf_dir_path, 'directories.yml')
-      @backup_dirs_yaml_file = YAML.load_file(directories_yaml_path) if config?
-      @locations = backup_dirs_yaml_file[:locations] if config?
+      @directories_yaml_file = YAML.load_file(directories_yaml_path) if config_ready?
+      @locations = directories_yaml_file[:locations] if config_ready?
     end
 
     def init_config_setup
