@@ -1,5 +1,6 @@
 require 'yaml'
 require 'logger'
+require 'date'
 require_relative 'helpers.rb'
 
 module Overcast
@@ -31,7 +32,7 @@ module Overcast
         if is_valid_path? dir
           locations.push dir
           File.write(directories_yaml_path, YAML.dump({ locations: locations.uniq }))
-          logger.info "Successfully added path: '#{dir}'" if locations.include? dir
+          logger.info "Successfully added path: '#{dir}'"
           added = true
         else
           logger.fatal "Path provided: '#{dir}' is not a valid path."
@@ -41,20 +42,18 @@ module Overcast
       added
     end
 
-    def display_locations
-      puts "-------------------------"
-      puts "| BACKUP DIRECTORIES [#{locations.size > 0 ? locations.size : 0}]|"
-      puts "-------------------------"
-      if locations.size.zero?
-        puts "No directories have been added..."
+    def remove_directory(dir)
+      removed = false
+      if is_valid_path?(dir)
+        if directories_yaml_file[:locations].include?(dir)
+          directories_yaml_file[:locations].delete(dir)
+          write_to_config(directories_yaml_file)
+          removed = true
+        end
       end
-
-      locations.each_with_index do |loc, index|
-        index += 1
-        puts "#{index}: #{loc}"
-      end
+      removed
     end
-
+    
     def config_ready?
       config_dir? && config?
     end
@@ -65,6 +64,14 @@ module Overcast
 
     def config?
       File.exist? directories_yaml_path
+    end
+
+    def write_to_config(locations_hash)
+      File.open(directories_yaml_path, 'w') { |file|
+        file.write(
+          YAML::dump(locations_hash)
+        )
+      }
     end
 
     private
