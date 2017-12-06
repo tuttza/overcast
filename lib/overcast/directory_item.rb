@@ -7,12 +7,17 @@ module Overcast
       @pattern = options[:pattern]
     end
 
-    def size
-      bytes = Dir.glob(File.join(@path, "**", "*"))
-        .map { |file| File.size(file) }
-        .inject(:+).to_f
+    def files
+      Dir.glob(File.join(@path, "**", "*"))
+    end
 
+    def size
+      bytes = files.map { |file| File.size(file) }.inject(:+).to_f
       bytes_to_size(bytes).to_s
+    end
+
+    def files_count
+     files.select { |file| File.file?(file) }.count
     end
 
     private

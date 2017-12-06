@@ -6,9 +6,9 @@ module Overcast
       #
       # options[Hash]
       # options hash valid keys:
-      #  :title - Text to display in window bar.
-      #  :parent - The Window/Container of this dialog.
-      #  :flags - Options for the dialog.
+      #  :title   - Text to display in window bar.
+      #  :parent  - The Window/Container of this dialog.
+      #  :flags   - Options for the dialog.
       #  :buttons - Buttons that will be display on the dialog
       #
       def initialize(options = {})
