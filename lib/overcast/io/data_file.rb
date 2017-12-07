@@ -7,7 +7,8 @@ module Overcast
 
       def initialize(file_path, file_name)
         @file_path = file_path
-        @file = File.join(@file_path, file_narelevant  end
+        @file = File.join(@file_path, file_name)
+      end
 
       def create
         created = false
