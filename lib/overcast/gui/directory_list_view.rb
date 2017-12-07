@@ -5,12 +5,12 @@ module Overcast
   module Gui
     class DiretoryListView < Gtk::TreeView
 
-      attr_accessor :list_store, :config
+      attr_accessor :list_store, :directory_store
 
       def initialize(options)
         @options = options.dup
         @list_store = @options[:list_store]
-        @config = @options[:config]
+        @directory_store = @options[:directory_store]
         # Gtk::TreeView.new(model = nil) requires a model A.K.A a Gtk::ListStore
         # to be passed to its constructor.
         super(@list_store)
@@ -24,10 +24,10 @@ module Overcast
         # TODO:
         #    Create a more efficient way to update the Gtk::ListStore.
         @list_store.clear
-        @config.locations.each do |location_path|
-          dir_item = Overcast::DirectoryItem.new({path: location_path})
+        @directory_store.directories.each do |dir_path|
+          dir_item = Overcast::DirectoryItem.new({path: dir_path})
           tree_iter = @list_store.append
-          tree_iter[0] = location_path
+          tree_iter[0] = dir_path
           tree_iter[1] = dir_item.size
           tree_iter[2] = dir_item.files_count.to_s
         end

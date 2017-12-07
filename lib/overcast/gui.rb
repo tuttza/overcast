@@ -1,5 +1,5 @@
 require "gtk3"
-require_relative "configuration"
+require_relative "directory_store"
 require_relative "directory_item"
 require_relative "gui/about_window"
 require_relative "gui/preferences_window"
@@ -11,7 +11,7 @@ module Overcast
   class Application
 
     def self.execute
-      config = Overcast::Configuration.new
+      directory_store = Overcast::DirectoryStore.new
 
       @window = Gtk::Window.new("Overcast")
       @window.border_width = 0
@@ -34,7 +34,7 @@ module Overcast
 
       model = Gtk::ListStore.new(String, String, String)
 
-      tree_view = Overcast::Gui::DiretoryListView.new({list_store: model, config: config})
+      tree_view = Overcast::Gui::DiretoryListView.new({list_store: model, directory_store: directory_store})
       tree_view.render
 
       scroll_window.add_with_viewport(tree_view)
@@ -64,9 +64,9 @@ module Overcast
       add_button.signal_connect("clicked") do
         dialog_result = directory_chooser_dialog.run
         if dialog_result == Gtk::ResponseType::ACCEPT
-          if config.locations.include?(directory_chooser_dialog.filename)
+          if directory_store.directories.include?(directory_chooser_dialog.filename)
             message_window.display
-          elsif config.is_subdir?(directory_chooser_dialog.filename)
+          elsif directory_store.is_subdir?(directory_chooser_dialog.filename)
             message_window = Overcast::Gui::MessageWindow.new(
                 {
                     parent: @window,
@@ -80,7 +80,7 @@ module Overcast
             )
             message_window.display
           else
-            config.add_directory(directory_chooser_dialog.filename)
+            directory_store.add_directory(directory_chooser_dialog.filename)
             directory_chooser_dialog.hide
             tree_view.render
           end
@@ -98,7 +98,7 @@ module Overcast
 
       remove_button.signal_connect("clicked") do
         treeiter = tree_view.selection.selected
-        config.remove_directory(treeiter.get_value(0))
+        directory_store.remove_directory(treeiter.get_value(0))
         model.remove(treeiter) if treeiter
       end
 
@@ -143,7 +143,7 @@ module Overcast
 
       submenu_item_preferences = Gtk::MenuItem.new(label: "Preferences")
       submenu_item_preferences.signal_connect("activate") do
-        preferences_window = Overcast::Gui::PreferencesWindow.new(Gtk::Window::TOPLEVEL, { parent: @window })
+        preferences_window = Overcast::Gui::PreferencesWindow.new(Gtk::WindowType::TOPLEVEL, { parent: @window })
         preferences_window.show_all
       end
 

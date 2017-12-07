@@ -1,5 +1,5 @@
 require "overcast/version"
-require 'overcast/configuration'
+require 'overcast/directory_store'
 
 module Overcast
 end
