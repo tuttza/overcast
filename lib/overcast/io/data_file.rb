@@ -34,7 +34,6 @@ module Overcast
       def load
         YAML.load_file(@file)
       end
-
     end
   end
 end

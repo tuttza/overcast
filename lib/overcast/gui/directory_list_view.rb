@@ -11,7 +11,7 @@ module Overcast
         @options = options.dup
         @list_store = @options[:list_store]
         @directory_store = @options[:directory_store]
-        # Gtk::TreeView.new(model = nil) requires a model A.K.A a Gtk::ListStore
+        # Gtk::TreeView.new(model = nil) requires a model a.k.a an Gtk::ListStore
         # to be passed to its constructor.
         super(@list_store)
         self.selection.set_mode(:single)

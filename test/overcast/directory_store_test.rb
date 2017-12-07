@@ -52,8 +52,10 @@ class DirectoryStoreTest < Minitest::Test
     assert @d_store.add_directory(root_path)
   end
 
-  def test_add_directory_fails_with_number_as_path
+  def test_add_directory_fails_with_non_string_path
     refute @d_store.add_directory(5)
+    refute @d_store.add_directory(true)
+    refute @d_store.add_directory({add_directory: "foo/bar"})
   end
 
   def test_add_directory_with_invalid_file_path
