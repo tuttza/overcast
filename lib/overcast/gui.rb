@@ -50,7 +50,7 @@ module Overcast
       )
 
       message_window = Overcast::Gui::MessageWindow.new(
-          {
+        {
               parent: @window,
               title: "Overcast Message",
               flags: [:modal, :destroy_with_parent],
@@ -91,7 +91,7 @@ module Overcast
         end
       end
 
-      box2.pack_start(add_button, expand: false, fill: false, padding: 0)
+      box2.pack_start(add_button, expand: false, fill: true, padding: 0)
 
       remove_button = Gtk::Button.new(label: "Remove")
       remove_button.can_focus = true

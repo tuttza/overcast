@@ -2,7 +2,7 @@ require 'yaml'
 
 module Overcast
   module IO
-    class DataFile
+    class YamlFile
       attr_accessor :file_path, :file
 
       def initialize(file_path, file_name)

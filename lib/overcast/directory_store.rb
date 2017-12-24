@@ -14,7 +14,7 @@ module Overcast
       options = options.dup
       @path = options[:path] || File.join(File.expand_path("~"), '/.overcast')
       @file_name = "directories.yml"
-      @file = Overcast::IO::DataFile.new(@path, @file_name)
+      @file = Overcast::IO::YamlFile.new(@path, @file_name)
       init_storage
       directories_yaml = @file.load if storage_ready?
       @directories = directories_yaml[:directories] if storage_ready?
@@ -26,6 +26,7 @@ module Overcast
       if is_valid_path?(dir)
         @directories.push(dir)
         data = { directories: @directories.uniq }
+        puts "data to be saved: #{data.inspect}"
         @file.write(data)
         added = true
       else
@@ -54,7 +55,7 @@ module Overcast
         if @directories.include?(dir)
           @directories.delete(dir)
           puts "removing #{dir} from directories.yml"
-          @file.write(@directories)
+          @file.write({ directories: @directories })
           removed = true
         end
       end
@@ -80,7 +81,7 @@ module Overcast
     end
 
     def create_storage_file
-      directories_yaml_structure = { directories: [] }
+      directories_yaml_structure = { directories: [] }.freeze
       @file.create
       @file.write(directories_yaml_structure)
     end
