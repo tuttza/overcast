@@ -23,13 +23,13 @@ module Overcast
     private
 
     def bytes_to_size(bytes)
-      units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'Pib', 'EiB'].freeze
+      units = ["B", "KiB", "MiB", "GiB", "TiB", "Pib", "EiB"].freeze
 
-      return '0.0 B' if bytes.zero?
+      return "0.0 B" if bytes.zero?
 
       exp = (Math.log(bytes) / Math.log(1024)).to_i
 
-      '%.1f %s' % [bytes.to_f / (1024 ** exp), units[exp]]
+      "%.1f %s" % [bytes.to_f / (1024 ** exp), units[exp]]
     end
 
   end

@@ -9,7 +9,7 @@ module Overcast
         super(window_type)
         self.title = "Preferences"
         self.resizable = false
-        self.set_default_size(650, 550)
+        self.set_default_size(550, 350)
         self.window_position = Gtk::WindowPosition::CENTER_ON_PARENT
         self.set_modal(true)
         self.transient_for = parent
@@ -43,6 +43,7 @@ module Overcast
       end
 
       private 
+      
       def init_combobox
         cb = Gtk::ComboBoxText.new
         storage_options = ['Local Drive', 'AWS', 'DropBox', 'Google Drive'].freeze

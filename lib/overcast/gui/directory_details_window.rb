@@ -16,7 +16,7 @@ module Overcast
         self.transient_for = parent
         self.window_position = Gtk::WindowPosition::CENTER_ON_PARENT # or :center_on_parent
         self.signal_connect("destroy") { self.hide }
-        box= Gtk::Box.new(:vertical, 0)
+        box = Gtk::Box.new(:vertical, 0)
         box.spacing = 6
         directory_files_count_label = Gtk::Label.new("# of Files:  #{@directory_item.files_count}")
         box.pack_start(directory_files_count_label, expand: false, fill: true, padding: 0)

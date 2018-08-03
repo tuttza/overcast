@@ -5,14 +5,19 @@ module Overcast
     class AboutWindow < Gtk::AboutDialog
       def initialize
         super
-        _authors = ["Zach Tuttle"].freeze
+        authors = ["Zach Tuttle"].freeze
         self.set_title("About Overcast")
         self.program_name = "Overcast"
         self.title = "About Overcast"
         self.version = "0.0.1"
         self.comments = "Overcast your backup manager!"
         self.copyright = "(c) Zach Tuttle"
-        self.authors = _authors
+        self.set_window_position(Gtk::WindowPosition::CENTER)
+        self.authors = authors
+      end
+
+      def set_parent=(parent)
+        self.transient_for = parent
       end
 
       def display

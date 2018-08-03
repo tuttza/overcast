@@ -15,14 +15,15 @@ module Overcast
 
       @window = Gtk::Window.new("Overcast")
       @window.border_width = 0
-      @window.set_default_size(800, 600)
+      @window.set_default_size(450, 450)
+      @window.set_window_position(Gtk::WindowPosition::CENTER)
       @window.signal_connect('destroy') { Gtk.main_quit }
 
       box1 = Gtk::Box.new(:vertical, 0)
       box1.spacing = 6
       @window.add(box1)
 
-      box1.pack_start(setup_menubar, expand: false, fill: false, padding: 0)
+      box1.pack_start(setup_menubar({ root_window: @window }), expand: false, fill: false, padding: 0)
 
       box2 = Gtk::Box.new(:vertical)
       box2.border_width = 10
@@ -36,11 +37,14 @@ module Overcast
 
       tree_view = Overcast::Gui::DiretoryListView.new({list_store: model, directory_store: directory_store})
       tree_view.render
+      tree_view.open_system_file_explorer
+
 
       scroll_window.add_with_viewport(tree_view)
 
       add_button = Gtk::Button.new(label: "Add")
       add_button.can_focus = true
+      add_button.set_tooltip_text("Click to add directories to be backed up")
 
       directory_chooser_dialog = Gtk::FileChooserDialog.new(
           title: "Select Directory",
@@ -93,15 +97,11 @@ module Overcast
 
       box2.pack_start(add_button, expand: false, fill: true, padding: 0)
 
-      remove_button = Gtk::Button.new(label: "Remove")
+      remove_button = Gtk::Button.new(label: "Remove", stock_id: "gtk-delete")
       remove_button.can_focus = true
+      remove_button.set_tooltip_text("Remove directory from list")
 
-      remove_button.signal_connect("clicked") do
-        treeiter = tree_view.selection.selected
-        directory_store.remove_directory(treeiter.get_value(0))
-        model.remove(treeiter) if treeiter
-      end
-
+      remove_button.signal_connect("clicked") { tree_view.remove_item }
 
       box2.pack_start(remove_button, expand: false, fill: true, padding: 20)
 
@@ -115,7 +115,7 @@ module Overcast
 
     private
 
-    def self.setup_menubar
+    def self.setup_menubar(options = {})
       menu_bar = Gtk::MenuBar.new
       file_menu = Gtk::Menu.new
       edit_file_menu = Gtk::Menu.new
@@ -133,6 +133,7 @@ module Overcast
       submenu_item_about = Gtk::MenuItem.new(label: "About")
       submenu_item_about.signal_connect("activate") do
         about = Overcast::Gui::AboutWindow.new
+        about.set_parent = options[:root_window]
         about.display
       end
 

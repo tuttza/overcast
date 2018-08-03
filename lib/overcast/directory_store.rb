@@ -2,7 +2,7 @@ require 'yaml'
 require 'logger'
 require 'date'
 require_relative 'helpers.rb'
-require_relative 'io/data_file'
+require_relative 'io/yaml_writer'
 
 module Overcast
   class DirectoryStore
@@ -14,7 +14,7 @@ module Overcast
       options = options.dup
       @path = options[:path] || File.join(File.expand_path("~"), '/.overcast')
       @file_name = "directories.yml"
-      @file = Overcast::IO::YamlFile.new(@path, @file_name)
+      @file = Overcast::IO::YamlWriter.new(@path, @file_name)
       init_storage
       directories_yaml = @file.load if storage_ready?
       @directories = directories_yaml[:directories] if storage_ready?

@@ -25,12 +25,26 @@ module Overcast
         #    Create a more efficient way to update the Gtk::ListStore.
         @list_store.clear
         @directory_store.directories.each do |dir_path|
-          dir_item = Overcast::DirectoryItem.new({path: dir_path})
+          dir_item = Overcast::DirectoryItem.new({ path: dir_path })
           tree_iter = @list_store.append
           tree_iter[0] = dir_path
           tree_iter[1] = dir_item.size
           tree_iter[2] = dir_item.files_count.to_s
         end
+      end
+
+      def open_system_file_explorer
+        self.signal_connect("row-activated") do 
+          treeiter = self.selection.selected
+          path = treeiter.get_value(0)
+          system("open #{path}")
+        end
+      end
+
+      def remove_item
+        treeiter = self.selection.selected
+        @directory_store.remove_directory(treeiter.get_value(0))
+        @list_store.remove(treeiter) if treeiter
       end
 
       private
