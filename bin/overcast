@@ -4,13 +4,12 @@ require 'bundler/setup'
 require 'overcast'
 require 'optparse'
 
+directory_store = Overcast::DirectoryStore.new
+
+
 options = {}
 OptionParser.new do |option|
   option.banner = 'Overcast'
-
-  option.on('-i', '--init', 'Initialize needed configuration files and directories') do |opt|
-    options[:init] = opt
-  end
 
   option.on('-a', '--add_dir PATH_TO_DIR', 'Add a directory to the directories.yml file') do |opt|
     options[:add_dir] = opt
@@ -30,21 +29,37 @@ OptionParser.new do |option|
 
 end.parse!
 
-if options[:init]
-  oc_config = Overcast::Configuration.new
-  oc_config.init_config_setup
-end
-
 if options[:version]
   puts "Overcast #{Overcast::VERSION}"
 end
 
 if options[:list_backup_directories]
-  oc_config = Overcast::Configuration.new
-  oc_config.display_locations
+  dir_items = []
+  
+  directory_store.directories.each do |dir_path|
+    dir_items << Overcast::DirectoryItem.new({ path: dir_path })
+  end
+
+  dirs = Overcast::Directory.new(directory_items: dir_items)
+
+  dirs.display_all
 end
 
 if options[:add_dir]
-  oc_config = Overcast::Configuration.new
-  oc_config.add_directory(options[:add_dir])
+  dir = options[:add_dir]
+
+  if directory_store.directories.include?(dir)
+    puts "The directory you are attempting to add has already been added.".light_yellow
+    return
+  end
+
+  if directory_store.is_subdir?(File.basename(dir))
+    puts "The directory you are attempting add has been included by a parent directory.".light_yellow
+    return
+  end
+  
+  if directory_store.add_directory(dir)
+    puts "Successfully added: '#{dir}'".light_green
+  end
+  
 end
