@@ -22,15 +22,13 @@ module Overcast
 
     def add_directory(dir)
       added = false
-      return added if !dir.is_a? String
+      return added unless dir.is_a? String
       if is_valid_path?(dir)
         @directories.push(dir)
         data = { directories: @directories.uniq }
-        puts "data to be saved: #{data.inspect}"
         @file.write(data)
         added = true
       else
-        puts "Path provided: '#{dir}' is not a valid path."
         return added
       end
       added
@@ -54,7 +52,6 @@ module Overcast
       if is_valid_path?(dir)
         if @directories.include?(dir)
           @directories.delete(dir)
-          puts "removing #{dir} from directories.yml"
           @file.write({ directories: @directories })
           removed = true
         end
