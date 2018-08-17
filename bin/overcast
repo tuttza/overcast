@@ -6,13 +6,17 @@ require 'optparse'
 
 directory_store = Overcast::DirectoryStore.new
 
-
 options = {}
+
 OptionParser.new do |option|
   option.banner = 'Overcast'
 
   option.on('-a', '--add_dir PATH_TO_DIR', 'Add a directory to the directories.yml file') do |opt|
     options[:add_dir] = opt
+  end
+
+  option.on("-r", "--remove PATH_TO_REMOVE", "Provide a path to remove a directory from your list backup directories") do |opt|
+    options[:directory_to_be_removed] = opt
   end
 
   option.on('-v', '--version', 'Display application version') do |opt|
@@ -34,26 +38,31 @@ if options[:version]
 end
 
 if options[:list_backup_directories]
+
+  if directory_store.directories.size.zero?
+    puts "No directories have been added yet...".light_yellow
+  end
+
   dir_items = []
   
   directory_store.directories.each do |dir_path|
     dir_items << Overcast::DirectoryItem.new({ path: dir_path })
   end
 
-  dirs = Overcast::Directory.new(directory_items: dir_items)
+  display = Overcast::CLI::Display.new(directory_items: dir_items)
 
-  dirs.display_all
+  display.render_directory_list
 end
 
 if options[:add_dir]
-  dir = options[:add_dir]
+  dir = options[:add_dir].chomp("/")
 
   if directory_store.directories.include?(dir)
     puts "The directory you are attempting to add has already been added.".light_yellow
     return
   end
 
-  if directory_store.is_subdir?(File.basename(dir))
+  if directory_store.is_subdir?(dir)
     puts "The directory you are attempting add has been included by a parent directory.".light_yellow
     return
   end
