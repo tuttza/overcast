@@ -4,5 +4,9 @@ module Overcast
       path = File.join(path.strip)
       Dir.exist?(path)
     end
+
+    def sanitize_path(path)
+    	path.chomp("/")
+    end
   end
 end

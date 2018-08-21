@@ -1,8 +1,8 @@
 require 'yaml'
 require 'logger'
 require 'date'
-require_relative 'helpers.rb'
-require_relative 'io/yaml_writer'
+require_relative "helpers.rb"
+require_relative "io/yaml_writer"
 
 module Overcast
   class DirectoryStore
@@ -23,6 +23,7 @@ module Overcast
     def add_directory(dir)
       added = false
       return added unless dir.is_a? String
+      sanitize_path(dir)
       if is_valid_path?(dir)
         @directories.push(dir)
         data = { directories: @directories.uniq }
@@ -36,9 +37,10 @@ module Overcast
 
     def is_subdir?(subdir_path)
       found_flag = false
+      sanitize_path(subdir_path)
       if is_valid_path?(subdir_path)
         @directories.each do |dir|
-          dir_array = Dir.glob("#{dir}/**/*")
+          dir_array = Dir.glob("#{dir}/**/*").select { |f| File.directory?(f) }
           if dir_array.include?(subdir_path)
             found_flag = true
           end
